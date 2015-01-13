@@ -23,9 +23,18 @@ module.exports = (robot) ->
     e = new Date(d)
     e - d.setHours(0,0,0,0)
 
+  midnight_today = ->
+    new Date().getTime()) - seconds_since_midnight
+
+  midnight_yesterday = ->
+    midnight_today - 86400 # seconds per day
+
+  time_was_yesterday = (time) ->
+    time < midnight_today && time >= midnight_yesterday
+
   send_reminders = ->
     for user in robot.brain.data.status_reminder.users
-      if user.last_status_date < (new Date().getTime()) - seconds_since_midnight
+      if user.last_status_date < midnight_today
         message = "Hey #{username}! Please update your daily status. Thanks!"
         robot.send {user: {name: user.username}}, message
 
@@ -50,8 +59,7 @@ module.exports = (robot) ->
       if user.last_status_date == 0
         date_str = "never :("
       else
-        date = new Date(user.last_status_date)
-        date_str = date.toLocaleDateString()
+        date_str = (new Date(user.last_status_date)).toLocaleDateString()
       msg.send "#{user.username} - Streak: #{user.streak} - Last update: #{date_str}"
 
   robot.respond /status reminder send reminders/i, ->
@@ -64,5 +72,7 @@ module.exports = (robot) ->
     username = msg.message.user.name
     users = robot.brain.data.status_reminder.users
     index = users.map((user) -> user.username).indexOf(username)
-    robot.brain.data.status_reminder.users[index].last_status_date = (new Date().getTime())
-    #TODO record streak data
+    user = robot.brain.data.status_reminder.users[index]
+    user.streak = time_was_yesterday(user.last_status_date) ? user.streak + 1 : 0
+    user.last_status_date = (new Date().getTime())
+
