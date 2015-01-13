@@ -74,5 +74,5 @@ module.exports = (robot) ->
     index = users.map((user) -> user.username).indexOf(username)
     user = robot.brain.data.status_reminder.users[index]
     user.streak = time_was_yesterday(user.last_status_date) ? user.streak + 1 : 0
-    user.last_status_date = (new Date().getTime())
+    user.last_status_date = new Date().getTime()
 
