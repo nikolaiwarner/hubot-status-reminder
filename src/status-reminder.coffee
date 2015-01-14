@@ -24,7 +24,7 @@ module.exports = (robot) ->
     e - d.setHours(0,0,0,0)
 
   midnight_today = ->
-    new Date().getTime()) - seconds_since_midnight
+    new Date().getTime() - seconds_since_midnight
 
   midnight_yesterday = ->
     midnight_today - 86400 # seconds per day
@@ -75,4 +75,3 @@ module.exports = (robot) ->
     user = robot.brain.data.status_reminder.users[index]
     user.streak = time_was_yesterday(user.last_status_date) ? user.streak + 1 : 0
     user.last_status_date = new Date().getTime()
-
